@@ -1,0 +1,9 @@
+read Q, Right;
+init: Qind := 0, Left := "()"
+     goto loop;
+loop: if Qind = Q goto stop else cont;
+
+cont: Instruction := Q[Qind],
+      Qind := Qind + 1
+      return "Not fully implemented yet";
+

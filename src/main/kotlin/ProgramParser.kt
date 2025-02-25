@@ -21,6 +21,8 @@ class ProgramParser {
         private val eq by literalToken("=")
         private val lbra by literalToken("[")
         private val rbra by literalToken("]")
+        private val lcur by literalToken("{")
+        private val rcur by literalToken("}")
 
 
         private val int by regexToken("-?\\d+") map { Expr.Num(it.text.toLong()) }
@@ -31,7 +33,7 @@ class ProgramParser {
         private val atom by int or chr or str or variable
 
         private val listItems by separated(ref(::expr), comma) map { Expr.Lst(it) }
-        private val list by parser { skip(lbra) * listItems() * skip(rbra) }
+        private val list by parser { skip(lcur) * listItems() * skip(rcur) }
 
         private val paren: Parser<Expr> by parser {
             skip(lpar)
@@ -40,16 +42,18 @@ class ProgramParser {
             v
         }
 
-//        val subscr: Parser<Expr> by parser {
-//            val arr = choose(atom, paren, list)
-//            skip(lbra)
-//            val ind = choose(atom, paren, list)
-//            skip(rbra)
-//            Expr.Subscript(arr, ind)
-//        }
+        private val primary: Parser<Expr> by atom or paren or list
+
+        val subscr: Parser<Expr> by parser {
+            val arr = primary()
+            skip(lbra)
+            val ind = expr()
+            skip(rbra)
+            Expr.Subscript(arr, ind)
+        }
 
         private val mulp: Parser<Expr> by parser {
-            reduce(atom or paren or list, mul or div) { l, o, r ->
+            reduce(subscr or primary /*primary*/, mul or div) { l, o, r ->
                 if (o.token == mul) Expr.Mul(l, r) else Expr.Div(l, r)
             }
         }
@@ -136,10 +140,8 @@ class ProgramParser {
 
         val program: Parser<Program> by parser {
             val readC = read()
-            println(readC)
             val blocks = separated(basicBlock, semicolon)()
             skip(semicolon)
-            println(blocks)
             Program(readC, blocks)
         }
 
