@@ -31,7 +31,7 @@ StringLiteral ::= \".*\"
 
 Expr ::= <Constant>
        | \( <Expr> \)
-       | <Expr>[<Expr>] (currently not supported)
+       | <Expr>[<Expr>]
        | <Expr> +/-/*/\/ <Expr>
        | <Expr> </=/> <Expr>
        | \[ \]
