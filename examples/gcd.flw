@@ -1,0 +1,8 @@
+read x, y;
+1: if x = y goto 7 else 2;
+2: if x < y goto 5 else 3;
+3: x := x - y
+    goto 1;
+5: y := y - x
+    goto 1;
+7: return x;
